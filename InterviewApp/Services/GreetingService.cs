@@ -15,7 +15,7 @@ namespace InterviewApp.Services
 
         private readonly GreetingSettings _settings = options.Value;
 
-        public void Run()
+        public string GetGreeting()
         {
             logger.LogInformation(
                 "Greeting service started (selected language: {Language})",
@@ -33,12 +33,13 @@ namespace InterviewApp.Services
 
                 greeting = Find(FallbackLanguage) ?? _settings.Greetings[0];
             }
-
-            Console.WriteLine($"{timeGreetingService.GetGreetingByTime()} {greeting.Message}");
+            var message = $"{timeGreetingService.GetGreetingByTime()}, {greeting.Message}";
 
             logger.LogInformation(
                 "Displayed greeting in {Language}: {Message}",
-                greeting.Language, greeting.Message);
+                greeting.Language, message);
+
+            return message;
         }
 
         private GreetingOptions? Find(string language) =>

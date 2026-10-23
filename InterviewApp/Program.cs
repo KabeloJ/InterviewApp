@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
+using System.Reflection;
+using MediatR;
+using InterviewApp.Greeting;
 
 class Program
 {
@@ -28,6 +31,7 @@ class Program
                 services.AddTransient<IGreetingService, GreetingService>();
                 services.AddTransient<ITimeGreetingService, TimeGreetingService>(); 
                 services.AddSingleton(TimeProvider.System);
+                services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             })
             .Build();
 
@@ -44,8 +48,9 @@ class Program
             return;
         }
 
-        var greetingService = host.Services.GetRequiredService<IGreetingService>();
-        greetingService.Run();
+        var mediator = host.Services.GetRequiredService<IMediator>();
+        var greeting = await mediator.Send(new GreetUserCommand());
+        Console.WriteLine(greeting);
 
         await host.StopAsync();
     }
