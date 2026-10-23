@@ -1,8 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using InterviewApp.Models;
+using InterviewApp.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using InterviewApp.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.Threading.Tasks;
 
 class Program
 {
@@ -13,12 +17,32 @@ class Program
             {
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             })
-            .ConfigureServices((_, services) => { services.AddTransient<IGreetingService, GreetingService>(); })
+            .ConfigureServices((context, services) =>
+            {
+                services.AddSingleton<IValidateOptions<GreetingSettings>, GreetingSettingsValidator>();
+
+                services.AddOptions<GreetingSettings>()
+                        .Bind(context.Configuration.GetSection(GreetingSettings.SectionName))
+                        .ValidateOnStart();
+
+                services.AddTransient<IGreetingService, GreetingService>();
+            })
             .Build();
+
+        var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+        try
+        {
+            await host.StartAsync();
+        }
+        catch (OptionsValidationException ex)
+        {
+            logger.LogError("Invalid configuration: {Failures}", string.Join("; ", ex.Failures));
+        }
 
         var greetingService = host.Services.GetRequiredService<IGreetingService>();
         greetingService.Run();
 
-        await host.RunAsync();
+        await host.StopAsync();
     }
 }

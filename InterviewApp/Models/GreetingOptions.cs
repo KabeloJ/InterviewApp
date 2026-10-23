@@ -1,8 +1,13 @@
-﻿namespace InterviewApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace InterviewApp.Models
 {
     public class GreetingOptions
     {
-        public string Message { get; set; }
-        public string Language { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Message { get; set; } = string.Empty;
+
+        [Required(AllowEmptyStrings = false)]
+        public string Language { get; set; } = string.Empty;
     }
 }
