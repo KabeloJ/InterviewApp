@@ -11,10 +11,15 @@ namespace InterviewApp.Greeting
 {
     public record GreetUserCommand : IRequest<string>;
 
-    public class GreetUserHandler(IGreetingService greetingService)
+    public class GreetUserHandler(IMediator mediator, IGreetingService greetingService)
         : IRequestHandler<GreetUserCommand, string>
     {
-        public Task<string> Handle(GreetUserCommand request, CancellationToken cancellationToken)
-            => Task.FromResult(greetingService.GetGreeting());
+        public async Task<string> Handle(GreetUserCommand request, CancellationToken cancellationToken)
+        {
+            var timeGreeting = await mediator.Send(new GetTimeGreetingQuery(), cancellationToken);
+            var message = greetingService.GetGreeting();
+
+            return $"{timeGreeting}, {message}";
+        }
     }
 }
