@@ -38,6 +38,8 @@ class Program
         catch (OptionsValidationException ex)
         {
             logger.LogError("Invalid configuration: {Failures}", string.Join("; ", ex.Failures));
+            Environment.ExitCode = 1;
+            return;
         }
 
         var greetingService = host.Services.GetRequiredService<IGreetingService>();
