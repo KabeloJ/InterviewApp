@@ -26,6 +26,8 @@ class Program
                         .ValidateOnStart();
 
                 services.AddTransient<IGreetingService, GreetingService>();
+                services.AddTransient<ITimeGreetingService, TimeGreetingService>(); 
+                services.AddSingleton(TimeProvider.System);
             })
             .Build();
 

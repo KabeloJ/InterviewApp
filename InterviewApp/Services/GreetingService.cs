@@ -8,7 +8,8 @@ namespace InterviewApp.Services
 {
     public class GreetingService(
         IOptions<GreetingSettings> options,
-        ILogger<GreetingService> logger) : IGreetingService
+        ILogger<GreetingService> logger,
+        ITimeGreetingService timeGreetingService) : IGreetingService
     {
         private const string FallbackLanguage = "English";
 
@@ -33,7 +34,7 @@ namespace InterviewApp.Services
                 greeting = Find(FallbackLanguage) ?? _settings.Greetings[0];
             }
 
-            Console.WriteLine(greeting.Message);
+            Console.WriteLine($"{timeGreetingService.GetGreetingByTime()} {greeting.Message}");
 
             logger.LogInformation(
                 "Displayed greeting in {Language}: {Message}",
